@@ -217,3 +217,6 @@ async def add_link(
     return AddLinkResponse(
         status="saved", url=clean, message="Saved. It will appear in your next Sunday digest."
     )
+
+    if __name__ == "__main__":
+        mcp.run()  # stdio by default; real clients launch this file via `mcp run`
