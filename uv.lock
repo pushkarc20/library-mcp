@@ -396,6 +396,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "mcp", extra = ["cli"] },
+    { name = "python-dotenv" },
     { name = "supabase" },
 ]
 
@@ -407,6 +408,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "mcp", extras = ["cli"], specifier = ">=2.3.0" },
+    { name = "python-dotenv", specifier = ">=1.2.4" },
     { name = "supabase", specifier = ">=2.34.1" },
 ]
 
