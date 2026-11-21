@@ -3,6 +3,7 @@
 Only allowlisted columns are ever selected, so page content, raw chat messages
 and error text never leave the database.
 """
+from urlcheck import UrlRejected, normalize_url
 import os
 import re
 
@@ -12,6 +13,7 @@ TABLE = "links"
 COLUMNS = "id,url,created_at,summary"  # allowlist: no content, raw_message or error
 READABLE_STATUSES = ["summarized", "sent"]
 FETCH_LIMIT = 500
+DEDUPE_SCAN_LIMIT = 2000
 ID_PATTERN = re.compile(r"^(\d{1,18}|[0-9a-fA-F-]{36})$")  # integer or UUID ids only
 
 _client = None
@@ -56,3 +58,38 @@ def fetch_one(link_id):
     )
     rows = result.data or []
     return rows[0] if rows else None
+
+def find_duplicate(rows, normalized_url):
+    """Pure function: id of a stored row whose URL normalizes to the same thing, else None."""
+    for row in rows:
+        try:
+            if normalize_url(row.get("url")) == normalized_url:
+                return row.get("id")
+        except UrlRejected:
+            continue  # legacy rows we would not accept today can't match a normalized URL
+    return None
+
+
+def find_existing(normalized_url):
+    """Check every status (pending, failed, skipped too), so we never queue the same page twice."""
+    result = (
+        _get_client()
+        .table(TABLE)
+        .select("id,url")
+        .order("created_at", desc=True)
+        .limit(DEDUPE_SCAN_LIMIT)
+        .execute()
+    )
+    return find_duplicate(result.data or [], normalized_url)
+
+
+def insert_link(normalized_url):
+    """The only write in this project. Returns the new row's id."""
+    result = (
+        _get_client()
+        .table(TABLE)
+        .insert({"url": normalized_url, "raw_message": normalized_url, "source": "mcp"})
+        .execute()
+    )
+    rows = result.data or []
+    return rows[0]["id"] if rows else None
