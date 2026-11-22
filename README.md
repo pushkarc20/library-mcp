@@ -17,6 +17,14 @@ I save links all week through a Telegram bot, and a weekly job turns them into a
 | `list_by_theme` | All themes with counts, or the links in one theme | No |
 | `add_link` | Save a new link, only after the human approves the exact URL | Yes |
 
+**The approval step.** In demo mode, the MCP Inspector shows the exact, cleaned URL. Tracking parameters and the fragment are removed, and nothing is saved until the box is ticked.
+
+![Approval form for add_link showing the cleaned URL](docs/images/approval-form.png)
+
+**Poisoned data stays data.** One sample entry contains a hidden instruction. The server returns it as plain text, next to a notice that it is untrusted.
+
+![get_summary result showing the untrusted-data notice and the hidden instruction as plain text](docs/images/untrusted-data-notice.png)
+
 ## Architecture
 
 ```mermaid
