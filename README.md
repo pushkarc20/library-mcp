@@ -111,6 +111,21 @@ Cold start from a fresh clone, no accounts, demo mode: about **24 seconds** for 
 2. Add harder eval cases: ambiguous requests, subtle injections, larger libraries, repeated runs per case.
 3. If this had to serve other people: hosted version with OAuth, per-user access controls and a scoped database role.
 
+## Repository layout
+
+```
+server.py        MCP server: the four tools
+store.py         database access (four columns only) and duplicate detection
+search.py        keyword search and theme grouping
+sanitize.py      cleaning and capping text from saved pages, plus the untrusted-data notice
+urlcheck.py      URL validation and normalisation for add_link
+tests/           unit and safety tests
+eval/            sample library, 12 test cases, runner, scorer and saved results
+QUICKSTART.md    try it in about a minute, no accounts needed
+```
+
+The code is deliberately flat: seven small files, run directly with `mcp dev` or `mcp run`, with no packaging step to get in the way.
+
 ## Tests
 
 ```
